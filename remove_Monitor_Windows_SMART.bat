@@ -1,0 +1,1 @@
+"%MIBDIRS%\..\scripts\erdcdeleter" --name "Monitor Windows Memory"

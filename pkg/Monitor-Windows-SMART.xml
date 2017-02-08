@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<uptime xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.uptimesoftware.com/erdc/erdc erdc" xmlns="http://www.uptimesoftware.com/erdc/erdc" xmlns:upt="http://www.uptimesoftware.com/erdc/erdc" version="4.0" target_grouping="other">
+	<class>Monitor Windows SMART</class>
+	<exec>com.uptimesoftware.uptime.erdc.MonitorCustomScriptRunner</exec>
+	<erdc_version>1.0</erdc_version>
+	<category>Operating System Monitors</category>
+    <category_related>Storage Monitors</category_related>
+    <grid_info>
+        <supported_versions>7.3,7.4,7.5,7.6,7.7,7.8</supported_versions>
+        <supported_platforms>windows</supported_platforms>
+        <upgrade_in_place>true</upgrade_in_place>
+        <requires_agent_scripts>false</requires_agent_scripts>
+    </grid_info>	
+	<elements>
+		<element name="process" parameter_type="input" data_type="string" gui_basic="1" range_type="0" hidden="true">
+			<control_options> size:40 </control_options>
+			<default_value>plugins/scripts/Monitor-Windows-SMART/Monitor-Windows-SMART.bat</default_value>
+			<short_description>Script Name</short_description>
+			<long_description>Name of the script/binary/process to be executed by up.time </long_description>
+			<validation_rule><alphanumeric/></validation_rule>
+			<error_message><alphanumeric>required field</alphanumeric></error_message>
+			<gui_type><string/></gui_type>
+		</element>
+		<element name='USERNAME' parameter_type='input' data_type='string' gui_basic='1' range_type='0' units=''>
+			<control_options>size:8</control_options>
+			<default_value></default_value>
+			<validation_rule><alphanumeric/></validation_rule>
+			<error_message><alphanumeric>required field</alphanumeric></error_message>
+			<short_description>Username</short_description>
+			<long_description>A user on the remote machine with access to read WMI, usually a local administrator.</long_description>
+			<gui_type><string/></gui_type>
+		</element>
+		<element name='PASSWORD' parameter_type='input' data_type='string' gui_basic='1' range_type='0' units=''>
+			<control_options>size:8</control_options>
+			<default_value></default_value>
+			<validation_rule><alphanumeric/></validation_rule>
+			<error_message><alphanumeric>required field</alphanumeric></error_message>
+			<short_description>Password</short_description>
+			<long_description>Password for the user we're using to gather the WMI metric.</long_description>
+			<gui_type><password/></gui_type>
+		</element>
+		<element name="authenticate" parameter_type="input" 
+			data_type="boolean" gui_basic="1" range_type="0"> 
+			<gui_type><boolean/></gui_type> 
+			<control_options>size:40 </control_options> 
+			<default_value/> 
+			<short_description>Use credentials to access WMI</short_description> 
+			<long_description>If this is a remote machine, credentials will be required to access WMI.</long_description> 
+			<validation_rule/> 
+			<error_message/> 
+		</element>
+		<element name='output' parameter_type='output' data_type='string' gui_basic='1' range_type='0' units=''>
+			<control_options>size:8</control_options>
+			<default_value></default_value>
+			<validation_rule/><error_message/>
+			<short_description>SMART reporting message</short_description>
+			<long_description>if there are any SMART statuses reported this will contain verbose info</long_description>
+			<gui_type><string/></gui_type>
+		</element>
+		<element name="timer" parameter_type="output" data_type="integer" gui_basic="0" range_type="0" units="ms" >
+			<control_options>size:8</control_options>
+			<default_value/>
+			<short_description>Response time</short_description>
+			<long_description>Response time in ms</long_description>
+			<validation_rule/>
+			<error_message/>
+			<gui_type><integer/></gui_type>
+		</element>
+	</elements>
+	<help>Retrieves information from SMART monitoring and other disk classes via PowerShell and WMI.</help>
+</uptime>
+
+
+
+
