@@ -10,11 +10,30 @@ With slight modifications #>
 $UPT_USERNAME = Get-ChildItem Env:UPTIME_USERNAME | select -expand value;
 $UPT_PASSWORD = Get-ChildItem Env:UPTIME_PASSWORD | select -expand value;
 $UPT_HOSTNAME = Get-ChildItem Env:UPTIME_HOSTNAME | select -expand value;
-$UPT_AUTHENTICATE = Get-ChildItem Env:UPTIME_AUTHENTICATE | select -expand value;
+
+#determine if running against localhost
+if($UPT_HOSTNAME -eq 'localhost' -Or $UPT_HOSTNAME -eq (Get-ChildItem Env:USERDOMAIN | select -expand value)) {
+	#write-host 'running local'
+	$runninglocal = "true"
+	}
 
 #Retrieve data from WMI using authentication or not depending on choice
-If($UPT_AUTHENTICATE -eq "true")
-{
+If($runninglocal) {
+	$logidisk = gwmi –query "SELECT * FROM win32_logicaldisk WHERE DriveType = '3'"
+	foreach ($ld in $logidisk) {
+		$drvltr = $ld.DeviceID
+		$free = $ld.FreeSpace
+		$model = (gwmi win32_logicaldisk -filter "Name='$drvltr'").GetRelated('Win32_DiskPartition').GetRelated('Win32_DiskDrive') |
+			foreach { $_.Model }
+		$deviceid = (gwmi win32_logicaldisk -filter "Name='$drvltr'").GetRelated('Win32_DiskPartition').GetRelated('Win32_DiskDrive') | 
+			foreach { $_.PNPDeviceID }
+		$predict = gwmi -Namespace root\wmi –class MSStorageDriver_FailurePredictStatus | 
+			Where-Object { $_.InstanceName -like "$deviceid*" } | foreach { $_.PredictFailure }
+		If ($predict -eq "true") {
+			write-host output Drive $drvltr of model $model, has a predicted failure via SMART reporting.
+			}
+	}
+} ELSE {
     $credential = New-Object System.Management.Automation.PsCredential($UPT_USERNAME, (ConvertTo-SecureString $UPT_PASSWORD -AsPlainText -Force))
 	$logidisk = gwmi -Credential $credential -ComputerName $UPT_HOSTNAME –query "SELECT * FROM win32_logicaldisk WHERE DriveType = '3'"
 	foreach ($ld in $logidisk) {
@@ -30,19 +49,4 @@ If($UPT_AUTHENTICATE -eq "true")
 			write-host output Drive $drvltr of model $model, has a predicted failure via SMART reporting.
 			}
 	}
-} ELSE {
-	$logidisk = gwmi –query "SELECT * FROM win32_logicaldisk WHERE DriveType = '3'"
-	foreach ($ld in $logidisk) {
-		$drvltr = $ld.DeviceID
-		$free = $ld.FreeSpace
-		$model = (gwmi win32_logicaldisk -filter "Name='$drvltr'").GetRelated('Win32_DiskPartition').GetRelated('Win32_DiskDrive') |
-			foreach { $_.Model }
-		$deviceid = (gwmi win32_logicaldisk -filter "Name='$drvltr'").GetRelated('Win32_DiskPartition').GetRelated('Win32_DiskDrive') | 
-			foreach { $_.PNPDeviceID }
-		$predict = gwmi -Namespace root\wmi –class MSStorageDriver_FailurePredictStatus | 
-			Where-Object { $_.InstanceName -like "$deviceid*" } | foreach { $_.PredictFailure }
-		If ($predict -eq "true") {
-			write-host output Drive $drvltr of model $model, has a predicted failure via SMART reporting.
-			}
-	}
-}
+}  
