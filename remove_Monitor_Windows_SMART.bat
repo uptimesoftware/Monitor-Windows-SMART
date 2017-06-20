@@ -1,1 +1,1 @@
-"%MIBDIRS%\..\scripts\erdcdeleter" --name "Monitor Windows Memory"
+"%MIBDIRS%\..\scripts\erdcdeleter" --name "Monitor Windows SMART"
